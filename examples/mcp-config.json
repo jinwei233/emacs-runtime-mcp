@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "emacs": {
+      "command": "emacs-runtime-mcp",
+      "args": ["--socket-name", "work"]
+    }
+  }
+}

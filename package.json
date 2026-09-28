@@ -1,0 +1,69 @@
+{
+  "name": "emacs-runtime-mcp",
+  "version": "0.1.0",
+  "description": "A minimal MCP bridge to a live Emacs Lisp runtime",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "emacs-runtime-mcp": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "skills",
+    "examples",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.34.5",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinwei233/emacs-runtime-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jinwei233/emacs-runtime-mcp/issues"
+  },
+  "homepage": "https://github.com/jinwei233/emacs-runtime-mcp#readme",
+  "keywords": [
+    "emacs",
+    "mcp",
+    "model-context-protocol",
+    "emacsclient"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "test": "vitest run --exclude 'tests/integration/**'",
+    "test:integration": "vitest run tests/integration",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.1.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
+    "@modelcontextprotocol/client": "^2.1.0",
+    "@types/node": "^20.19.17",
+    "typescript": "^7.0.2",
+    "vitest": "^3.2.4"
+  }
+}

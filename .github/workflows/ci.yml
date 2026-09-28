@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install Emacs
+        run: sudo apt-get update && sudo apt-get install --yes emacs-nox
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:integration
+      - run: pnpm pack --pack-destination "$RUNNER_TEMP"
+      - name: Verify package contents
+        run: |
+          archive="$RUNNER_TEMP/emacs-runtime-mcp-0.1.0.tgz"
+          tar -tzf "$archive" | grep -Fx package/dist/cli.js
+          tar -tzf "$archive" | grep -Fx package/skills/emacs-live/SKILL.md
+          tar -tzf "$archive" | grep -Fx package/SECURITY.md
