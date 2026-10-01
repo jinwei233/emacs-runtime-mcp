@@ -1,6 +1,6 @@
 ---
 name: emacs-live
-description: Operates a trusted local live Emacs through emacs_eval. Use for runtime inspection, capability discovery, and verified Emacs changes. Do not use with untrusted clients.
+description: Operates a trusted local live Emacs through emacs_eval. Use for runtime inspection, capability discovery, and verified Emacs changes. Do not use with untrusted clients. For org-roam note recording, resolve the roam directory at runtime and read its AGENTS.md conventions first.
 ---
 
 # Emacs Live
@@ -10,7 +10,8 @@ as code execution with the permissions of Emacs and the local user.
 
 ## Workflow
 
-1. **Inspect** the relevant live state before choosing an operation.
+1. **Inspect** the relevant live state before choosing an operation. For org-roam note recording,
+   read the roam directory's `AGENTS.md` conventions first (see below).
 2. **Discover** candidate symbols through runtime introspection. Search configuration or package
    source only when runtime evidence is insufficient.
 3. **Review** the candidate's arguments, interactive form, source, side effects, and asynchronous
@@ -58,6 +59,39 @@ For loaded capabilities:
       :function-defined (fboundp 'FUNCTION)
       :variable-defined (boundp 'VARIABLE))
 ```
+
+## Org-Roam Notes: Read Repository Conventions First
+
+When the task records notes into org-roam (capture, create, edit, link, or index), resolve the
+roam directory at runtime and load the repository conventions before touching any note. Never
+hardcode `~/roam` or any other fixed path.
+
+1. **Resolve** the directory and probe for `AGENTS.md` in one read-only expression:
+
+   ```elisp
+   (let* ((dir (when (boundp 'org-roam-directory)
+                 (expand-file-name org-roam-directory)))
+          (agents (and dir (expand-file-name "AGENTS.md" dir))))
+     (list :feature-loaded (featurep 'org-roam)
+           :roam-directory dir
+           :agents-file agents
+           :agents-exists (and agents (file-readable-p agents))))
+   ```
+
+   If `org-roam-directory` is unbound and the feature is not loaded, run `(require 'org-roam nil t)`
+   once, then re-probe. Only if org-roam itself is unavailable, ask the user where the notes live.
+
+2. **Read** the returned `AGENTS.md` path completely with a plain file read (not `emacs_eval`)
+   before creating or modifying any note. Follow its conventions for naming, templates, link
+   targets, escaping, and database sync. If no `AGENTS.md` exists, proceed with the generic
+   workflow.
+
+3. **Re-resolve** the directory per task instead of reusing a previously observed path; the
+   directory variable may point elsewhere for different sessions or worktrees.
+
+The pattern generalizes: whenever a working directory may carry its own conventions file
+(`AGENTS.md` or similar), resolve the directory at runtime, read the file when present, and
+follow it instead of assuming a hardcoded path or generic defaults.
 
 ## Discover And Review
 
