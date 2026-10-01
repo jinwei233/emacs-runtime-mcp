@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "emacs-runtime-mcp": "./dist/cli.js"
+    "emacs-runtime-mcp": "dist/cli.js"
   },
   "exports": {
     ".": {
